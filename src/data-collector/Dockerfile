@@ -16,4 +16,4 @@ COPY . .
 EXPOSE 8000
 
 #set start command for container
-CMD [ "node", "app.js" , "node", "websocketServer.js"]
+CMD [ "node", "app.js"]

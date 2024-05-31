@@ -1,12 +1,15 @@
-version: '3.8'
+version: '2.4'
 
 services:
   angular-app:
     build: .
+    image: customizeappv2-angular-app:latest
     ports:
       - "4200:4200"
     networks:
-      - app-network
+      #- app-network
+      - internal-network
+    mem_limit: 1g
 
   datacollector:
     build:

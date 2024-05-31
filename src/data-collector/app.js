@@ -81,7 +81,13 @@ async function setupInfluxDB() {
   }
 }
 
-setupInfluxDB();
+//setupInfluxDB();
+// function createDatabase() {
+//   influx.createDatabase(INFLUXDB_DATABASE)
+//   console.log("database created");
+// }
+// setTimeout(createDatabase, 12000);
+setTimeout(setupInfluxDB, 12000);
 
 client.on("message", async (topic, message) => {
   console.log("Received message on topic:", topic);
