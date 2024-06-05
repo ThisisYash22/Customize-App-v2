@@ -34,7 +34,7 @@ const options = {
 };
 
 const client = mqtt.connect('mqtt://' + MQTT_IP, options);
-
+let isInfluxDBReady = false;
 const wss = new WebSocket.Server({ server });
 
 client.on("connect", () => {
@@ -67,29 +67,30 @@ const influx = new Influx.InfluxDB({
   ],
 });
 
-// async function setupInfluxDB() {
-//   try {
-//     const names = await influx.getDatabaseNames();
-//     if (!names.includes(INFLUXDB_DATABASE)) {
-//       await influx.createDatabase(INFLUXDB_DATABASE);
-//       console.log(`Database "${INFLUXDB_DATABASE}" created`);
-//     } else {
-//       console.log(`Database "${INFLUXDB_DATABASE}" already exists`);
-//     }
-//   } catch (err) {
-//     console.error("Error setting up InfluxDB:", err);
-//   }
-// }
+async function setupInfluxDB() {
+  try {
+    const names = await influx.getDatabaseNames();
+    if (!names.includes(INFLUXDB_DATABASE)) {
+      await influx.createDatabase(INFLUXDB_DATABASE);
+      console.log(`Database "${INFLUXDB_DATABASE}" created`);
+      isInfluxDBReady = true;
+    } else {
+      console.log(`Database "${INFLUXDB_DATABASE}" already exists`);
+    }
+  } catch (err) {
+    console.error("Error setting up InfluxDB:", err);
+  }
+}
 //timer set:
-  // setTimeout(setupInfluxDB, 12000);
+  setTimeout(setupInfluxDB, 12000);
 //timer not set: 
   //setupInfluxDB();
 
-async function createDatabase() {
-  await influx.createDatabase(INFLUXDB_DATABASE)
-  console.log("database created");
-}
-setTimeout(createDatabase, 12000);
+// async function createDatabase() {
+//   await influx.createDatabase(INFLUXDB_DATABASE)
+//   console.log("database created");
+// }
+// setTimeout(createDatabase, 12000);
 
 client.on("message", async (topic, message) => {
   console.log("Received message on topic:", topic);
@@ -131,6 +132,11 @@ client.on("message", async (topic, message) => {
 });
 
 wss.on('connection', async (ws) => {
+  if (!isInfluxDBReady) {
+    console.log("InfluxDB is not ready yet. Closing WebSocket connection.");
+    ws.close();
+    return;
+  }
   console.log('New WebSocket connection');
   try {
     // Fetch initial data
