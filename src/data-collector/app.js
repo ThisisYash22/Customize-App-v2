@@ -67,27 +67,29 @@ const influx = new Influx.InfluxDB({
   ],
 });
 
-async function setupInfluxDB() {
-  try {
-    const names = await influx.getDatabaseNames();
-    if (!names.includes(INFLUXDB_DATABASE)) {
-      await influx.createDatabase(INFLUXDB_DATABASE);
-      console.log(`Database "${INFLUXDB_DATABASE}" created`);
-    } else {
-      console.log(`Database "${INFLUXDB_DATABASE}" already exists`);
-    }
-  } catch (err) {
-    console.error("Error setting up InfluxDB:", err);
-  }
-}
-
-//setupInfluxDB();
-// function createDatabase() {
-//   influx.createDatabase(INFLUXDB_DATABASE)
-//   console.log("database created");
+// async function setupInfluxDB() {
+//   try {
+//     const names = await influx.getDatabaseNames();
+//     if (!names.includes(INFLUXDB_DATABASE)) {
+//       await influx.createDatabase(INFLUXDB_DATABASE);
+//       console.log(`Database "${INFLUXDB_DATABASE}" created`);
+//     } else {
+//       console.log(`Database "${INFLUXDB_DATABASE}" already exists`);
+//     }
+//   } catch (err) {
+//     console.error("Error setting up InfluxDB:", err);
+//   }
 // }
-// setTimeout(createDatabase, 12000);
-setTimeout(setupInfluxDB, 12000);
+//timer set:
+  // setTimeout(setupInfluxDB, 12000);
+//timer not set: 
+  //setupInfluxDB();
+
+async function createDatabase() {
+  await influx.createDatabase(INFLUXDB_DATABASE)
+  console.log("database created");
+}
+setTimeout(createDatabase, 12000);
 
 client.on("message", async (topic, message) => {
   console.log("Received message on topic:", topic);
