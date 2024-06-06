@@ -31,7 +31,7 @@ export class AppComponent implements OnInit, AfterViewInit {
   private chartContainer!: HTMLElement;
   streaming: boolean = true;
   constructor(private http: HttpClient) {
-    this.socket$ = webSocket<DataPoint[]>('ws://192.168.1.102:8000');
+    this.socket$ = webSocket<DataPoint[]>('ws://'+location.hostname+':8000');
   }
 
   ngOnInit(): void {
