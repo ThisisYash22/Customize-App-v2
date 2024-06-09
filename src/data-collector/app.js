@@ -33,7 +33,16 @@ const options = {
   'password': MQTT_PASSWORD
 };
 
-const client = mqtt.connect('mqtt://' + MQTT_IP, options);
+//const client = mqtt.connect('mqtt://' + MQTT_IP, options);
+let client;
+
+try {
+  client = mqtt.connect('mqtt://' + MQTT_IP, options);
+  console.log("Connected to MQTT Broker:" + MQTT_IP);
+} catch(error) {
+  console.error("Error in connecting broker:", error);
+}
+
 let isInfluxDBReady = false;
 const wss = new WebSocket.Server({ server });
 
@@ -76,6 +85,7 @@ async function setupInfluxDB() {
       isInfluxDBReady = true;
     } else {
       console.log(`Database "${INFLUXDB_DATABASE}" already exists`);
+      isInfluxDBReady = true;
     }
   } catch (err) {
     console.error("Error setting up InfluxDB:", err);
