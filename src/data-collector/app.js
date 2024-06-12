@@ -14,9 +14,9 @@ let configbuffer = fs.readFileSync(pathConfig);
 console.log("configbuffer: " + configbuffer);
 envconfig = JSON.parse(configbuffer);
 
-const MQTT_IP = envconfig.env.MQTT_BROKER_SERVER || 'ie-databus';
-const MQTT_TOPIC = envconfig.env.MQTT_TOPIC || 'ie/d/j/simatic/v1/s7c1/dp/r/';
-const DATA_SOURCE_NAME = envconfig.env.DATA_SOURCE_NAME || 'PLC_1/default';
+const MQTT_IP = envconfig.env.MQTT_BROKER_SERVER || 'ie-databus'; //IP
+const MQTT_TOPIC = envconfig.env.MQTT_TOPIC || 'ie/d/j/simatic/v1/s7c1/dp/r/'; //Topic
+const DATA_SOURCE_NAME = envconfig.env.DATA_SOURCE_NAME || 'PLC_1/default'; 
 const MQTT_USER = envconfig.env.MQTT_USER || 'edge';
 const MQTT_PASSWORD = envconfig.env.MQTT_PASSWORD || 'edge';
 const INFLUXDB_IP = envconfig.env.INFLUXDB_IP || 'influxdb';
@@ -27,30 +27,29 @@ app.use(express.json());
 app.use(cors());
 
 const options = {
-  clientId: "mqttjs_" + Math.random().toString(16).slice(2, 10),
-  protocolId: "MQTT",
+  'clientId': 'mqttjs_' + Math.random().toString(16).slice(2, 10),
+  'protocolId': 'MQTT',
   'username': MQTT_USER,
   'password': MQTT_PASSWORD
 };
 
-const client = mqtt.connect('mqtt://' + MQTT_IP, options);
-// let client;
+// const client = mqtt.connect('mqtt://' + MQTT_IP, options);
+let client;
 
-// try {
-//   client = mqtt.connect('mqtt://' + MQTT_IP, options);
-//   console.log("Connected to MQTT Broker:" + MQTT_IP);
-// } catch(error) {
-//   console.error("Error in connecting broker:", error);
-// }
+try {
+  client = mqtt.connect('mqtt://' + MQTT_IP, options);
+  // console.log("Connected to MQTT Broker:" + MQTT_IP);
+} catch(error) {
+  console.error("Error in connecting broker:", error);
+}
 
-let isInfluxDBReady = false;
-const wss = new WebSocket.Server({ server });
 
-client.on("connect", () => {
+
+client.on('connect', () => {
   console.log("Connected to " + MQTT_IP);
   client.subscribe(MQTT_TOPIC+DATA_SOURCE_NAME, (err) => {
     if (err) {
-      console.error("Failed to subscribe to " + MQTT_TOPIC + +DATA_SOURCE_NAME + ":", err);
+      console.error("Failed to subscribe to " + MQTT_TOPIC+DATA_SOURCE_NAME + ":", err);
     } else {
       console.log("Subscribed to " + MQTT_TOPIC +DATA_SOURCE_NAME);
     }
@@ -75,7 +74,8 @@ const influx = new Influx.InfluxDB({
     },
   ],
 });
-
+let isInfluxDBReady = false;
+const wss = new WebSocket.Server({ server });
 async function setupInfluxDB() {
   try {
     const names = await influx.getDatabaseNames();
