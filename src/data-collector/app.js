@@ -15,10 +15,13 @@ console.log("configbuffer: " + configbuffer);
 envconfig = JSON.parse(configbuffer);
 
 const MQTT_IP = envconfig.env.MQTT_BROKER_SERVER || 'ie-databus'; //IP
+//tcp://ie-databus:1883
 const MQTT_TOPIC = envconfig.env.MQTT_TOPIC || 'ie/d/j/simatic/v1/s7c1/dp/r/'; //Topic
 const DATA_SOURCE_NAME = envconfig.env.DATA_SOURCE_NAME || 'PLC_1/default'; 
+
 const MQTT_USER = envconfig.env.MQTT_USER || 'edge';
 const MQTT_PASSWORD = envconfig.env.MQTT_PASSWORD || 'edge';
+
 const INFLUXDB_IP = envconfig.env.INFLUXDB_IP || 'influxdb';
 const INFLUXDB_DATABASE = envconfig.env.INFLUXDB_DATABASE || 'databus_values';
 
@@ -27,23 +30,17 @@ app.use(express.json());
 app.use(cors());
 
 const options = {
-  'clientId': 'mqttjs_' + Math.random().toString(16).slice(2, 10),
-  'protocolId': 'MQTT',
-  'username': MQTT_USER,
-  'password': MQTT_PASSWORD
+  clientId: 'mqttjs_' + Math.random().toString(16).slice(2, 10), 
+  protocolId: 'MQTT', //
+  username: MQTT_USER, //edge
+  password: MQTT_PASSWORD //edge
 };
 
-// const client = mqtt.connect('mqtt://' + MQTT_IP, options);
-let client;
+const client = mqtt.connect('tcp://' + MQTT_IP + ':1883', options);
 
-try {
-  client = mqtt.connect('mqtt://' + MQTT_IP, options);
-  // console.log("Connected to MQTT Broker:" + MQTT_IP);
-} catch(error) {
-  console.error("Error in connecting broker:", error);
-}
-
-
+console.dir(client, { depth: null });
+console.log("\n \n Options:", JSON.stringify(options, null, 2));
+console.log("\n\n");
 
 client.on('connect', () => {
   console.log("Connected to " + MQTT_IP);
@@ -54,6 +51,18 @@ client.on('connect', () => {
       console.log("Subscribed to " + MQTT_TOPIC +DATA_SOURCE_NAME);
     }
   });
+});
+
+client.on('error', (err) => {
+  console.error('MQTT connection error:', err);
+});
+
+client.on('offline', () => {
+  console.log('MQTT client went offline');
+});
+
+client.on('reconnect', () => {
+  console.log('MQTT client is trying to reconnect');
 });
 
 const influx = new Influx.InfluxDB({
