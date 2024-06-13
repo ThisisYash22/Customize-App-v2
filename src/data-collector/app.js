@@ -31,12 +31,13 @@ app.use(cors());
 
 const options = {
   clientId: 'mqttjs_' + Math.random().toString(16).slice(2, 10), 
-  protocolId: 'MQTT', //
+  //protocolId: 'tcp', 
+  protocol:"tcp",
   username: MQTT_USER, //edge
   password: MQTT_PASSWORD //edge
 };
 
-const client = mqtt.connect('tcp://' + MQTT_IP + ':1883', options);
+const client = mqtt.connect(MQTT_IP + ':1883', options);
 
 console.dir(client, { depth: null });
 console.log("\n \n Options:", JSON.stringify(options, null, 2));
