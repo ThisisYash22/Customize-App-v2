@@ -4,6 +4,7 @@ const mqtt = require("mqtt");
 const express = require("express");
 const cors = require("cors");
 const WebSocket = require('ws');
+const { hostname } = require("os");
 const app = express();
 const server = require('http').createServer(app);
 const PORT = 8000;
@@ -34,10 +35,11 @@ const options = {
   //protocolId: 'tcp', 
   protocol:"tcp",
   username: MQTT_USER, //edge
-  password: MQTT_PASSWORD //edge
+  password: MQTT_PASSWORD, //edge
 };
 
-const client = mqtt.connect(MQTT_IP + ':1883', options);
+const URL = 'tcp://ie-databus:1883';
+const client = mqtt.connect(URL, options);
 
 console.dir(client, { depth: null });
 console.log("\n \n Options:", JSON.stringify(options, null, 2));

@@ -17,6 +17,7 @@ services:
     image: data-collector_edge:0.0.2
     restart: "no"
     networks:
+      - proxy-redirect
       - internal-network
     depends_on: 
       # - server
@@ -53,10 +54,11 @@ services:
     mem_limit: 250mb
 
 networks:
-  app-network:
-    driver: bridge
+  # app-network:
+  #   driver: bridge
   proxy-redirect:
     external: true
+    name: proxy-redirect
   internal-network:
     name: internal-network
 
